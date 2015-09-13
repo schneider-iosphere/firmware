@@ -832,10 +832,30 @@ unsigned HAL_Core_System_Clock(HAL_SystemClock clock, void* reserved)
 
 int HAL_Feature_Set(HAL_Feature feature, bool enabled)
 {
+    switch (feature)
+    {
+        case FEATURE_RETAINED_MEMORY:
+        {
+            FunctionalState state = enabled ? ENABLE : DISABLE;
+            // Switch on backup SRAM clock
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_BKPSRAM, state);
+            // Switch on backup power regulator, so that it survives the sleep mode
+            PWR_BackupRegulatorCmd(state);
+            return 0;
+        }
+
+    }
     return -1;
 }
 
 bool HAL_Feature_Get(HAL_Feature feature)
 {
+    switch (feature)
+    {
+        case FEATURE_WARM_START:
+        {
+            return (PWR_GetFlagStatus(PWR_FLAG_SB) != RESET);
+        }
+    }
     return false;
 }
