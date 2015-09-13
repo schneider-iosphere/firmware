@@ -9,6 +9,7 @@ MEMORY
      /* The SRAM Origin is system_part1_module_ram_end, and extends to
         system_static_ram_start */
     SRAM      (rwx) : ORIGIN = 0x20000300, LENGTH = 0x20000 - 0x300 - 40K
+    BACKUPSRAM (rwx) : ORIGIN = 0x40024000, LENGTH = 4K
 }
 
 SECTIONS
@@ -85,6 +86,17 @@ SECTIONS
         *(.ARM.extab*)
         __extab_end = .;
     } > APP_FLASH  AT> APP_FLASH
+
+
+    .backup :
+    {
+        link_global_retained_initial_values = LOADADDR( .backup ); /* This is the location in flash of the initial values of retained global variables */
+        link_global_retained_start = .;
+        *(.retained_user*)
+        link_global_retained_end = .;
+        . = ALIGN(., 4);
+    }>BACKUPSRAM AT> APP_FLASH
+
 
     .data : /* Contains the non-zero initialised global variables */
     {
