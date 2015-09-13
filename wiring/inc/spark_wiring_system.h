@@ -29,7 +29,9 @@
 #include "system_sleep.h"
 #include "system_cloud.h"
 #include "system_event.h"
+#include "core_hal.h"
 #include "interrupts_hal.h"
+#include "system_user.h"
 
 class Stream;
 
@@ -95,6 +97,26 @@ public:
     template<typename Condition> static bool waitCondition(Condition _condition, system_tick_t timeout) {
         const system_tick_t start = millis();
         return waitConditionWhile(_condition, [=]{ return (millis()-start)<timeout; });
+    }
+
+
+    inline bool featureEnabled(HAL_Feature feature)
+    {
+        return HAL_Feature_Get(feature);
+    }
+
+    inline int enableFeature(HAL_Feature feature)
+    {
+        int result = HAL_Feature_Set(feature, true);
+        if (feature==FEATURE_RETAINED_MEMORY && !HAL_Feature_Get(FEATURE_WARM_START)) {
+            system_initialize_user_backup_ram();
+        }
+        return result;
+    }
+
+    inline int disableFeature(HAL_Feature feature)
+    {
+        return HAL_Feature_Set(feature, false);
     }
 
 };
