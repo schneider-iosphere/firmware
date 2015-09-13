@@ -158,6 +158,15 @@ typedef enum HAL_SystemClock
  */
 unsigned HAL_Core_System_Clock(HAL_SystemClock clock, void* reserved);
 
+
+typedef enum HAL_Feature {
+    FEATURE_RETAINED_MEMORY=1,       // [write only] retained memory on backup power
+    FEATURE_WARM_START               // [read only] set to true if previous retained memory contents are available]
+} HAL_Feature;
+
+int HAL_Feature_Set(HAL_Feature feature, bool enabled);
+bool HAL_Feature_Get(HAL_Feature feature);
+
 #ifdef __cplusplus
 }
 #endif

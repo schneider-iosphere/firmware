@@ -43,6 +43,7 @@
 #include "core_cm3.h"
 #include "bootloader.h"
 #include "core_hal_stm32f2xx.h"
+#include "stm32f2xx.h"
 
 void HardFault_Handler( void ) __attribute__( ( naked ) );
 
@@ -826,4 +827,15 @@ bool HAL_Core_System_Reset_FlagSet(RESET_TypeDef resetType)
 unsigned HAL_Core_System_Clock(HAL_SystemClock clock, void* reserved)
 {
     return SystemCoreClock;
+}
+
+
+int HAL_Feature_Set(HAL_Feature feature, bool enabled)
+{
+    return -1;
+}
+
+bool HAL_Feature_Get(HAL_Feature feature)
+{
+    return false;
 }
