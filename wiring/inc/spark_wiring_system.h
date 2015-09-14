@@ -30,6 +30,14 @@
 #include "system_cloud.h"
 #include "system_event.h"
 #include "interrupts_hal.h"
+#ifdef SPARK_PLATFORM
+#include "hw_ticks.h"
+#if PLATFORM_ID<3
+#include "stm32f10x.h"
+#else
+#include "stm32f2xx.h"
+#endif
+#endif
 
 class Stream;
 
@@ -51,6 +59,19 @@ public:
     static void factoryReset(void);
     static void dfu(bool persist=false);
     static void reset(void);
+
+    static void enterSafeMode(void) {
+    }
+
+#ifdef SPARK_PLATFORM
+    static inline uint32_t ticksPerMicrosecond() {
+        return SYSTEM_US_TICKS;
+    }
+
+    static inline uint32_t ticks() {
+        return DWT->CYCCNT;
+    }
+#endif
 
     static void sleep(Spark_Sleep_TypeDef sleepMode, long seconds=0);
     static void sleep(long seconds) { sleep(SLEEP_MODE_WLAN, seconds); }
