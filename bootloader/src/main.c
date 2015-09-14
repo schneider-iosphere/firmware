@@ -139,7 +139,7 @@ int main(void)
     }
 
     uint8_t features = SYSTEM_FLAG(FeaturesEnabled_SysFlag);
-    // disabling this until we can be sure DCT corruption won't bite. 
+    // disabling this until we can be sure DCT corruption won't bite.
     if (true || (features!=0xFF && (((~(features>>4)&0xF)) != (features & 0xF))) || (features&8)) {     // bit 3 must be reset for this to be enabled
         features = 0xFF;        // ignore - corrupt. Top 4 bits should be the inverse of the bottom 4
     }
@@ -189,6 +189,11 @@ int main(void)
         {
             USB_DFU_MODE = 1;
             //Subsequent system reset or power on-off should execute normal firmware
+            HAL_Core_Write_Backup_Register(BKP_DR_01, 0xFFFF);
+        }
+        else if (BKP_DR1_Value == ENTER_SAFE_MODE_APP_REQUEST)
+        {
+            SAFE_MODE = 1;
             HAL_Core_Write_Backup_Register(BKP_DR_01, 0xFFFF);
         }
         // Else check if the system has resumed from IWDG reset
