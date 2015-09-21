@@ -320,3 +320,30 @@ uint16_t HAL_Get_Claim_Code(char* buffer, unsigned len)
     return result;
 }
 
+int HAL_Set_System_Config(hal_system_config_t config_item, const void* data, unsigned data_length)
+{
+    unsigned offset;
+    unsigned length = 0;
+
+    switch (config_item)
+    {
+    case SYSTEM_CONFIG_DEVICE_PRIVATE_KEY:
+        offset = DCT_DEVICE_PRIVATE_KEY_OFFSET;
+        length = DCT_DEVICE_PRIVATE_KEY_SIZE;
+        break;
+    case SYSTEM_CONFIG_SERVER_PUBLIC_KEY:
+        offset = DCT_SERVER_PUBLIC_KEY_OFFSET;
+        length = DCT_SERVER_PUBLIC_KEY_SIZE;
+        break;
+    case SYSTEM_CONFIG_DEVICE_FAMILY_NAME:
+        offset = DCT_SSID_PREFIX_OFFSET;
+        dct_write_app_data(&data_length, offset++, 1);
+        length = data_length;
+        break;
+    }
+
+    if (length)
+        dct_write_app_data(data, offset, length>data_length ? data_length : length);
+
+    return length==0;
+}
