@@ -10,6 +10,8 @@ TARGET_USB_OTG_SRC_PATH = $(TARGET_USB_OTG_PATH)/src
 CSRC += $(TARGET_USB_OTG_SRC_PATH)/usb_core.c
 CSRC += $(TARGET_USB_OTG_SRC_PATH)/usb_dcd_int.c
 CSRC += $(TARGET_USB_OTG_SRC_PATH)/usb_dcd.c
+CSRC += $(TARGET_USB_OTG_SRC_PATH)/usb_hcd_int.c
+CSRC += $(TARGET_USB_OTG_SRC_PATH)/usb_hcd.c
 
 # C++ source files included in this build.
 CPPSRC +=

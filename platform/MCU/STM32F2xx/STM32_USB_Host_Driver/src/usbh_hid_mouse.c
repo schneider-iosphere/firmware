@@ -119,7 +119,7 @@ HID_cb_TypeDef HID_MOUSE_cb =
 static void  MOUSE_Init ( void)
 {
  /* Call User Init*/
- USR_MOUSE_Init();
+ //USR_MOUSE_Init();
 }
 
 /**
@@ -135,7 +135,7 @@ static void  MOUSE_Decode(uint8_t *data)
   HID_MOUSE_Data.x      = data[1];
   HID_MOUSE_Data.y      = data[2];
 
-  USR_MOUSE_ProcessData(&HID_MOUSE_Data);
+  //USR_MOUSE_ProcessData(&HID_MOUSE_Data);
 
 }
 /**

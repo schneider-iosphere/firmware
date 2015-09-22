@@ -7,7 +7,13 @@
 TARGET_USB_HS_SRC_PATH = $(TARGET_USB_HS_PATH)/src
 
 # C source files included in this build.
-CSRC +=
+CSRC += $(TARGET_USB_HS_SRC_PATH)/usbh_core.c
+CSRC += $(TARGET_USB_HS_SRC_PATH)/usbh_hcs.c
+CSRC += $(TARGET_USB_HS_SRC_PATH)/usbh_ioreq.c
+CSRC += $(TARGET_USB_HS_SRC_PATH)/usbh_stdreq.c
+CSRC += $(TARGET_USB_HS_SRC_PATH)/usbh_hid_core.c
+CSRC += $(TARGET_USB_HS_SRC_PATH)/usbh_hid_keybd.c
+CSRC += $(TARGET_USB_HS_SRC_PATH)/usbh_hid_mouse.c
 
 # C++ source files included in this build.
 CPPSRC +=

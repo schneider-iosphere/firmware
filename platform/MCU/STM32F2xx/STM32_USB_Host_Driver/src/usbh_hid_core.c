@@ -126,36 +126,37 @@ __IO uint8_t start_toggle = 0;
 * @{
 */
 
-static USBH_Status USBH_HID_InterfaceInit  (USB_OTG_CORE_HANDLE *pdev ,
+static USBH_Status USBH_HID_InterfaceInit  (USB_OTG_CORE_HANDLE *pdev , 
                                             void *phost);
 
 static void  USBH_ParseHIDDesc (USBH_HIDDesc_TypeDef *desc, uint8_t *buf);
 
-static void USBH_HID_InterfaceDeInit  (USB_OTG_CORE_HANDLE *pdev ,
+static void USBH_HID_InterfaceDeInit  (USB_OTG_CORE_HANDLE *pdev , 
                                        void *phost);
 
-static USBH_Status USBH_HID_Handle(USB_OTG_CORE_HANDLE *pdev ,
+static USBH_Status USBH_HID_Handle(USB_OTG_CORE_HANDLE *pdev , 
                                    void *phost);
 
-static USBH_Status USBH_HID_ClassRequest(USB_OTG_CORE_HANDLE *pdev ,
+static USBH_Status USBH_HID_ClassRequest(USB_OTG_CORE_HANDLE *pdev , 
                                          void *phost);
 
-static USBH_Status USBH_Get_HID_ReportDescriptor (USB_OTG_CORE_HANDLE *pdev,
+static USBH_Status USBH_Get_HID_ReportDescriptor (USB_OTG_CORE_HANDLE *pdev, 
                                                   USBH_HOST *phost,
                                                   uint16_t length);
 
 static USBH_Status USBH_Get_HID_Descriptor (USB_OTG_CORE_HANDLE *pdev,\
-                                            USBH_HOST *phost,
+                                            USBH_HOST *phost,  
                                             uint16_t length);
 
-static USBH_Status USBH_Set_Idle (USB_OTG_CORE_HANDLE *pdev,
+static USBH_Status USBH_Set_Idle (USB_OTG_CORE_HANDLE *pdev, 
                                   USBH_HOST *phost,
                                   uint8_t duration,
                                   uint8_t reportId);
 
-static USBH_Status USBH_Set_Protocol (USB_OTG_CORE_HANDLE *pdev,
+static USBH_Status USBH_Set_Protocol (USB_OTG_CORE_HANDLE *pdev, 
                                       USBH_HOST *phost,
                                       uint8_t protocol);
+
 
 
 USBH_Class_cb_TypeDef  HID_cb =

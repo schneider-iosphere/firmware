@@ -34,6 +34,8 @@
 #include "usbd_desc.h"
 #include "delay_hal.h"
 
+#include "usbh_core.h"
+#include "usbh_hid_core.h"
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
@@ -42,6 +44,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 USB_OTG_CORE_HANDLE USB_OTG_dev;
+USBH_HOST USB_Host;
 
 extern uint32_t USBD_OTG_ISR_Handler(USB_OTG_CORE_HANDLE *pdev);
 #ifdef USB_OTG_HS_DEDICATED_EP1_ENABLED
@@ -72,15 +75,12 @@ extern volatile uint8_t  USB_Rx_State;
 void SPARK_USB_Setup(void)
 {
     USBD_Init(&USB_OTG_dev,
-#ifdef USE_USB_OTG_FS
-            USB_OTG_FS_CORE_ID,
-#elif defined USE_USB_OTG_HS
             USB_OTG_HS_CORE_ID,
-#endif
             &USR_desc,
             &USBD_CDC_cb,
             NULL);
 }
+
 
 /*******************************************************************************
  * Function Name  : Get_SerialNum.
@@ -96,6 +96,47 @@ void Get_SerialNum(void)
 #endif
 
 #ifdef USB_CDC_ENABLE
+
+void USB_OTG_Setup(USBH_Usr_cb_TypeDef_DTO callbacks)
+{
+	
+	USBH_Usr_cb_TypeDef USR_Callbacks =
+{
+  callbacks.Init,
+  callbacks.DeInit,
+  callbacks.DeviceAttached,
+  callbacks.ResetDevice,
+  callbacks.DeviceDisconnected,
+  callbacks.OverCurrentDetected,
+  callbacks.DeviceSpeedDetected,
+  callbacks.DeviceDescAvailable,
+  callbacks.DeviceAddressAssigned,
+  NULL,
+  callbacks.ManufacturerString,
+  callbacks.ProductString,
+  callbacks.SerialNumString,
+  callbacks.EnumerationDone,
+  NULL,
+  NULL,
+  callbacks.DeviceNotSupported,
+  callbacks.UnrecoveredError
+};
+
+    DCD_DevDisconnect (&USB_OTG_dev);
+    USB_OTG_StopDevice(&USB_OTG_dev);   
+
+  USBH_Init(&USB_OTG_dev, 
+            USB_OTG_HS_CORE_ID,
+            &USB_Host,
+            &HID_cb, 
+            &USR_Callbacks);
+}
+
+void USB_OTG_Process()
+{
+	USBH_Process(&USB_OTG_dev , &USB_Host);
+}
+
 /*******************************************************************************
  * Function Name  : USB_USART_Init
  * Description    : Start USB-USART protocol.

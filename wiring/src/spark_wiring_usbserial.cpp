@@ -74,6 +74,16 @@ int USBSerial::peek()
 	return USB_USART_Receive_Data(true);
 }
 
+void USBSerial::Initialize(USBH_Usr_cb_TypeDef_DTO callbacks)
+{
+	USB_OTG_Setup(callbacks);
+}
+
+void USBSerial::Process()
+{
+	USB_OTG_Process();
+}
+
 // Preinstantiate Objects //////////////////////////////////////////////////////
 #ifdef SPARK_USB_SERIAL
 USBSerial Serial;

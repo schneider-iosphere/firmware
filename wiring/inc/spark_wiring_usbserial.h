@@ -43,6 +43,9 @@ public:
 	void begin(long speed);
 	void end();
 	int peek();
+	
+	void Initialize(USBH_Usr_cb_TypeDef_DTO callbacks);
+	void Process();
 
 	virtual size_t write(uint8_t byte);
 	virtual int read();

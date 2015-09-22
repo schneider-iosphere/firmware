@@ -35,6 +35,8 @@
 DYNALIB_BEGIN(hal_usart)
 
 #ifdef USB_CDC_ENABLE
+DYNALIB_FN(hal_usart,USB_OTG_Setup)
+DYNALIB_FN(hal_usart,USB_OTG_Process)
 DYNALIB_FN(hal_usart,USB_USART_Init)
 DYNALIB_FN(hal_usart,USB_USART_Available_Data)
 DYNALIB_FN(hal_usart,USB_USART_Receive_Data)

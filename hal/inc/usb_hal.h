@@ -30,6 +30,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
+//#include "usbh_def.h"
+
 /* Exported types ------------------------------------------------------------*/
 
 /* Exported constants --------------------------------------------------------*/
@@ -64,6 +66,50 @@ void Get_SerialNum(void);
 #endif
 
 #ifdef USB_CDC_ENABLE
+
+typedef struct _USBH_USR_PROP1
+{
+  void (*Init)(void);       /* HostLibInitialized */
+  void (*DeInit)(void);       /* HostLibInitialized */  
+  void (*DeviceAttached)(void);           /* DeviceAttached */
+  void (*ResetDevice)(void);
+  void (*DeviceDisconnected)(void); 
+  void (*OverCurrentDetected)(void);  
+  void (*DeviceSpeedDetected)(uint8_t DeviceSpeed);          /* DeviceSpeed */
+  void (*DeviceDescAvailable)(void *);    /* DeviceDescriptor is available */
+  void (*DeviceAddressAssigned)(void);  /* Address is assigned to USB Device */
+  //void (*ConfigurationDescAvailable)(USBH_CfgDesc_TypeDef *,
+                                     //USBH_InterfaceDesc_TypeDef *,
+                                     //USBH_EpDesc_TypeDef *); 
+  /* Configuration Descriptor available */
+  void (*ManufacturerString)(void *);     /* ManufacturerString*/
+  void (*ProductString)(void *);          /* ProductString*/
+  void (*SerialNumString)(void *);        /* SerialNubString*/
+  void (*EnumerationDone)(void);           /* Enumeration finished */
+  int  (*UserInput)(void);
+  int  (*UserApplication) (void);
+  void (*DeviceNotSupported)(void); /* Device is not supported*/
+  void (*UnrecoveredError)(void);
+
+}
+USBH_Usr_cb_TypeDef_DTO;
+
+/*
+typedef struct _USBH_Class_cb1
+{
+  int  (*Init)\
+    (void *phost);
+  void         (*DeInit)\
+    (void *phost);
+  int  (*Requests)\
+    (void *phost);  
+  int  (*Machine)\
+    (void *phost);     
+  
+} USBH_Class_cb_TypeDef_DTO;*/
+
+void USB_OTG_Setup(USBH_Usr_cb_TypeDef_DTO callbacks);
+void USB_OTG_Process();
 /**
  * Initialize or deinitialize USB serial
  * @param baudRate  The data rate of the connection. If 0, the connection is

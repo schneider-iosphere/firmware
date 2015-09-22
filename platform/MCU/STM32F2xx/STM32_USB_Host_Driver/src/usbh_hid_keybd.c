@@ -225,7 +225,7 @@ static  const  int8_t  HID_KEYBRD_ShiftKey[] = {
 static void  KEYBRD_Init (void)
 {
   /* Call User Init*/
-  USR_KEYBRD_Init();
+  //USR_KEYBRD_Init();
 }
 
 /**
@@ -237,6 +237,7 @@ static void  KEYBRD_Init (void)
 
 static void KEYBRD_Decode(uint8_t *pbuf)
 {
+	/*
   static  uint8_t   shift;
   static  uint8_t   keys[KBR_MAX_NBR_PRESSED];
   static  uint8_t   keys_new[KBR_MAX_NBR_PRESSED];
@@ -248,7 +249,7 @@ static void KEYBRD_Decode(uint8_t *pbuf)
   uint8_t   ix;
   uint8_t   jx;
   uint8_t   error;
-  uint8_t   output;
+ // uint8_t   output;
 
   nbr_keys      = 0;
   nbr_keys_new  = 0;
@@ -256,7 +257,7 @@ static void KEYBRD_Decode(uint8_t *pbuf)
   key_newest    = 0x00;
 
 
-  /* Check if Shift key is pressed */
+  
   if ((pbuf[0] == KBD_LEFT_SHIFT) || (pbuf[0] == KBD_RIGHT_SHIFT)) {
     shift = TRUE;
   } else {
@@ -265,7 +266,7 @@ static void KEYBRD_Decode(uint8_t *pbuf)
 
   error = FALSE;
 
-  /* Check for the value of pressed key */
+
   for (ix = 2; ix < 2 + KBR_MAX_NBR_PRESSED; ix++) {
     if ((pbuf[ix] == 0x01) ||
         (pbuf[ix] == 0x02) ||
@@ -301,13 +302,12 @@ static void KEYBRD_Decode(uint8_t *pbuf)
     key_newest = keys_new[0];
 
     if (shift == TRUE) {
-      output =  HID_KEYBRD_ShiftKey[HID_KEYBRD_Codes[key_newest]];
+     // output =  HID_KEYBRD_ShiftKey[HID_KEYBRD_Codes[key_newest]];
     } else {
-      output =  HID_KEYBRD_Key[HID_KEYBRD_Codes[key_newest]];
+      //output =  HID_KEYBRD_Key[HID_KEYBRD_Codes[key_newest]];
     }
 
-    /* call user process handle */
-    USR_KEYBRD_ProcessData(output);
+    //USR_KEYBRD_ProcessData(output);
   } else {
     key_newest = 0x00;
   }
@@ -316,7 +316,7 @@ static void KEYBRD_Decode(uint8_t *pbuf)
   nbr_keys_last  = nbr_keys;
   for (ix = 0; ix < KBR_MAX_NBR_PRESSED; ix++) {
     keys_last[ix] = keys[ix];
-  }
+  }*/
 }
 
 /**

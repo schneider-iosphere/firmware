@@ -111,6 +111,8 @@
 /****************** USB OTG FS CONFIGURATION **********************************/
 #ifdef USB_OTG_FS_CORE
  #define RX_FIFO_FS_SIZE                          128
+ #define TXH_NP_FS_FIFOSIZ                         96
+ #define TXH_P_FS_FIFOSIZ                          96
  #define TX0_FIFO_FS_SIZE                          32
  #define TX1_FIFO_FS_SIZE                         128
  #define TX2_FIFO_FS_SIZE                          32
@@ -129,7 +131,9 @@
 #define TX3_FIFO_HS_SIZE                          0
 #define TX4_FIFO_HS_SIZE                          0
 #define TX5_FIFO_HS_SIZE                          0
-
+#define TXH_NP_HS_FIFOSIZ                         96
+#define TXH_P_HS_FIFOSIZ                          96
+ 
 //#define USB_OTG_HS_SOF_OUTPUT_ENABLED
 
 #ifdef USE_ULPI_PHY
@@ -138,7 +142,7 @@
 #ifdef USE_EMBEDDED_PHY
 #define USB_OTG_EMBEDDED_PHY_ENABLED
 /* wakeup is working only when HS core is configured in FS mode */
-#define USB_OTG_HS_LOW_PWR_MGMT_SUPPORT
+//#define USB_OTG_HS_LOW_PWR_MGMT_SUPPORT
 #endif
 /* #define USB_OTG_HS_INTERNAL_DMA_ENABLED */ /*In High Speed mode, it is not possible to
                                                  use DMA for writing/reading to/from Flash/OTP memories
@@ -157,7 +161,7 @@
 //#define VBUS_SENSING_ENABLED  //OTG_HS_VBUS (PB13 pin) on BM-09 is not exposed
 
 /****************** USB OTG MODE CONFIGURATION ********************************/
-//#define USE_HOST_MODE
+#define USE_HOST_MODE
 #define USE_DEVICE_MODE
 //#define USE_OTG_MODE
 
