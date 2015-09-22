@@ -84,6 +84,7 @@ void setup() {
   
 	//using existing Serial object (for now)
 	//initialize usb host with callbacks
+	//this never completes IF a USB device is connected upon startup
 	Serial.Initialize(USR_Callbacks1);
 }
 
