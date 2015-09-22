@@ -327,34 +327,7 @@ void USBH_USR_OverCurrentDetected (void)
 */
 void USR_MOUSE_Init	(void)
 {
-  
-  //LCD_UsrLog((void*)USB_HID_MouseStatus); 
-  //LCD_UsrLog("\n\n\n\n\n\n\n\n");
-  //LCD_DisplayStringLine( LCD_PIXEL_HEIGHT - 42, "                                   ");
-  //LCD_DisplayStringLine( LCD_PIXEL_HEIGHT - 30, "                                   ");
-    
-  /* Display Mouse Window */
-  //LCD_DrawRect(MOUSE_WINDOW_X,
-  //             MOUSE_WINDOW_Y, 
-  //             MOUSE_WINDOW_HEIGHT,
-  //             MOUSE_WINDOW_WIDTH);
-  
-  HID_MOUSE_ButtonReleased(0);
-  HID_MOUSE_ButtonReleased(1);
-  HID_MOUSE_ButtonReleased(2);
-  
 
-  //LCD_SetTextColor(LCD_COLOR_GREEN);
-  //LCD_SetBackColor(LCD_COLOR_BLACK);
-  
-  //LCD_DisplayChar(MOUSE_WINDOW_X + 1,
-   //                         MOUSE_WINDOW_Y - 1,
-   //                         'x');
-  x_loc  = 0;
-  y_loc  = 0; 
-  prev_x = 0;
-  prev_y = 0;
-  
 }
 
 /**
@@ -365,37 +338,7 @@ void USR_MOUSE_Init	(void)
 */
 void USR_MOUSE_ProcessData(HID_MOUSE_Data_TypeDef *data)
 {
-  
-  uint8_t idx = 1;   
-  static uint8_t b_state[3] = { 0, 0 , 0};
-  
-  if ((data->x != 0) && (data->y != 0))
-  {
-    HID_MOUSE_UpdatePosition(data->x , data->y);
-  }
-  
-  for ( idx = 0 ; idx < 3 ; idx ++)
-  {
-    
-    if(data->button & 1 << idx) 
-    {
-      if(b_state[idx] == 0)
-      {
-        HID_MOUSE_ButtonPressed (idx);
-        b_state[idx] = 1;
-      }
-    }
-    else
-    {
-      if(b_state[idx] == 1)
-      {
-        HID_MOUSE_ButtonReleased (idx);
-        b_state[idx] = 0;
-      }
-    }
-  }
-  
-  
+
 }
 
 /**
@@ -407,17 +350,6 @@ void USR_MOUSE_ProcessData(HID_MOUSE_Data_TypeDef *data)
 void  USR_KEYBRD_Init (void)
 {
 
-  //LCD_UsrLog((void*)USB_HID_KeybrdStatus); 
-  //LCD_UsrLog("> Use Keyboard to tape characters: \n\n");   
-  //LCD_UsrLog("\n\n\n\n\n\n");
-  //LCD_DisplayStringLine( LCD_PIXEL_HEIGHT - 42, "                                   ");
-  //LCD_DisplayStringLine( LCD_PIXEL_HEIGHT - 30, "                                   ");  
-    
-  //LCD_SetTextColor(Green);
-
-  
-  KeybrdCharXpos = KYBRD_FIRST_LINE;
-  KeybrdCharYpos = KYBRD_FIRST_COLUMN;
 }
 
 
@@ -430,55 +362,6 @@ void  USR_KEYBRD_Init (void)
 void  USR_KEYBRD_ProcessData (uint8_t data)
 {
   
-  if(data == '\n')
-  {
-    KeybrdCharYpos = KYBRD_FIRST_COLUMN;
-    
-    /*Increment char X position*/
-    KeybrdCharXpos+=SMALL_FONT_LINE_WIDTH;
-    
-  }
-  else if (data == '\r')
-  {
-    /* Manage deletion of charactter and upadte cursor location*/
-    if( KeybrdCharYpos == KYBRD_FIRST_COLUMN) 
-    {
-      /*First character of first line to be deleted*/
-      if(KeybrdCharXpos == KYBRD_FIRST_LINE)
-      {  
-        KeybrdCharYpos =KYBRD_FIRST_COLUMN; 
-      }
-      else
-      {
-        KeybrdCharXpos-=SMALL_FONT_LINE_WIDTH;
-        KeybrdCharYpos =(KYBRD_LAST_COLUMN+SMALL_FONT_COLUMN_WIDTH); 
-      }
-    }
-    else
-    {
-      KeybrdCharYpos +=SMALL_FONT_COLUMN_WIDTH;                  
-      
-    } 
-    //LCD_DisplayChar(KeybrdCharXpos,KeybrdCharYpos, ' '); 
-  }
-  else
-  {
-    //LCD_DisplayChar(KeybrdCharXpos,KeybrdCharYpos, data);    
-    /* Update the cursor position on LCD */
-    
-    /*Increment char Y position*/
-    KeybrdCharYpos -=SMALL_FONT_COLUMN_WIDTH;
-    
-    /*Check if the Y position has reached the last column*/
-    if(KeybrdCharYpos == KYBRD_LAST_COLUMN)
-    {
-      KeybrdCharYpos = KYBRD_FIRST_COLUMN;
-      
-      /*Increment char X position*/
-      KeybrdCharXpos+=SMALL_FONT_LINE_WIDTH;
-      
-    }
-  }
 }
 
 /**
