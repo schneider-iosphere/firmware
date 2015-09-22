@@ -1,10 +1,11 @@
 /**
   ******************************************************************************
-  * @file    main.c
-  * @author  MCD Application Team
+  * @file    main.cpp
+  * @author  Robert Campo
   * @version V2.1.0
   * @date    19-March-2012
-  * @brief   USB host HID mouse/keyboard class demo main file
+  * @brief   This is a modification of the original HID example provided 
+  *          by ST in version 2.1.0 of their driver
   ******************************************************************************
   * @attention
   *
@@ -42,64 +43,14 @@ TCPClient client;
 #define KYBRD_FIRST_LINE                 (uint8_t)120
 #define KYBRD_LAST_LINE                  (uint8_t)200
 
-
-/**
-* @}
-*/ 
+//using TCP client for debugging (that's all I got!)
+byte server[] = { 192, 168, 1, 120 };
 uint8_t  KeybrdCharXpos           = 0;
 uint16_t KeybrdCharYpos           = 0;
-byte server[] = { 192, 168, 1, 120 };
 extern  int16_t  x_loc, y_loc; 
 extern __IO int16_t  prev_x, prev_y;
 
-/** @addtogroup USBH_USER
-* @{
-*/
-
-/** @defgroup USBH_USR_MAIN
-* @brief This file is the HID demo main file
-* @{
-*/ 
-
-/** @defgroup USBH_USR_MAIN_Private_TypesDefinitions
-* @{
-*/ 
-/**
-* @}
-*/ 
-
-/** @defgroup USBH_USR_MAIN_Private_Defines
-* @{
-*/ 
-/**
-* @}
-*/ 
-
-
-/** @defgroup USBH_USR_MAIN_Private_Macros
-* @{
-*/ 
-/**
-* @}
-*/ 
-
-
-
-
-/** @defgroup USBH_USR_MAIN_Private_FunctionPrototypes
-* @{
-*/ 
-/**
-* @}
-*/ 
-
-
-/** @defgroup USBH_USR_MAIN_Private_Functions
-* @{
-*/ 
-
 __IO uint32_t i = 0;
-//USBHost USBHost;
 char bufferHeader[512];
 
 USBH_Usr_cb_TypeDef_DTO USR_Callbacks1 =
@@ -125,32 +76,16 @@ USBH_Usr_cb_TypeDef_DTO USR_Callbacks1 =
 };
 
 void setup() {
-	  
-  /*!< At this stage the microcontroller clock setting is already configured, 
-  this is done through SystemInit() function which is called from startup
-  file (startup_stm32fxxx_xx.s) before to branch to application main.
-  To reconfigure the default setting of SystemInit() function, refer to
-  system_stm32fxxx.c file
-  */  
   
-  pinMode(led2, OUTPUT);
+	pinMode(led2, OUTPUT);
   
-  client.connect(server, 8001);
-  client.read();
+	client.connect(server, 8001);
+	client.read();
   
-  Serial.end();
-
-  /* Init Host Library */
-  Serial.Initialize(USR_Callbacks1);
-	//Serial.begin(9600);
+	//using existing Serial object (for now)
+	//initialize usb host with callbacks
+	Serial.Initialize(USR_Callbacks1);
 }
-
-
-/**
-* @brief  Main routine for HID mouse / keyboard class application
-* @param  None
-* @retval int
-*/
 
 int loopCheck = 0;
 
@@ -161,61 +96,10 @@ void loop() {
 		client.println("Starting loop");
 		loopCheck = 1;
 	}
-	
-	    /* Host Task handler */
+
+	//call process to check for changes in the host controller
 	Serial.Process();
-	
-	//digitalWrite(led2, HIGH);
-    //USBH_Process(&USB_OTG_Core_dev , &USB_Host);
-    
- 
 }
-
-
-/**
-* @}
-*/
-
-/** @defgroup USBH_USR_Private_Constants
-* @{
-*/ 
-/*--------------- LCD Messages ---------------*/
-const uint8_t MSG_HOST_INIT[]          = "> Host Library Initialized\n";
-const uint8_t MSG_DEV_ATTACHED[]       = "> Device Attached\n";
-const uint8_t MSG_DEV_DISCONNECTED[]   = "> Device Disconnected\n";
-const uint8_t MSG_DEV_ENUMERATED[]     = "> Enumeration completed\n";
-const uint8_t MSG_DEV_HIGHSPEED[]      = "> High speed device detected\n";
-const uint8_t MSG_DEV_FULLSPEED[]      = "> Full speed device detected\n";
-const uint8_t MSG_DEV_LOWSPEED[]       = "> Low speed device detected\n";
-const uint8_t MSG_DEV_ERROR[]          = "> Device fault \n";
-
-const uint8_t MSG_MSC_CLASS[]          = "> Mass storage device connected\n";
-const uint8_t MSG_HID_CLASS[]          = "> HID device connected\n";
-
-const uint8_t USB_HID_MouseStatus[]    = "> HID Demo Device : Mouse\n";
-const uint8_t USB_HID_KeybrdStatus[]   = "> HID Demo Device : Keyboard\n";
-const uint8_t MSG_UNREC_ERROR[]        = "> UNRECOVERED ERROR STATE\n";
-/**
-* @}
-*/
-
-
-
-/** @defgroup USBH_USR_Private_FunctionPrototypes
-* @{
-*/ 
-/**
-* @}
-*/ 
-
-
-/** @defgroup USBH_USR_Private_Functions
-* @{
-*/ 
-
-
-
-
 
 /**
 * @brief  USBH_USR_Init 
