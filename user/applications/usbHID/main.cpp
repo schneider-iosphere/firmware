@@ -77,7 +77,7 @@ USBH_Usr_cb_TypeDef_DTO USR_Callbacks1 =
 
 void setup() {
   
-	pinMode(led2, OUTPUT);
+	//pinMode(led2, OUTPUT);
   
 	client.connect(server, 8001);
 	client.read();

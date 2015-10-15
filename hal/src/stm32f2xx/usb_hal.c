@@ -46,6 +46,7 @@
 USB_OTG_CORE_HANDLE USB_OTG_dev;
 USBH_HOST USB_Host;
 
+extern uint32_t USBH_OTG_ISR_Handler(USB_OTG_CORE_HANDLE *pdev);
 extern uint32_t USBD_OTG_ISR_Handler(USB_OTG_CORE_HANDLE *pdev);
 #ifdef USB_OTG_HS_DEDICATED_EP1_ENABLED
 extern uint32_t USBD_OTG_EP1IN_ISR_Handler(USB_OTG_CORE_HANDLE *pdev);
@@ -313,7 +314,14 @@ void OTG_FS_irq(void)
  */
 void OTG_HS_irq(void)
 {
-    USBD_OTG_ISR_Handler(&USB_OTG_dev);
+    if (USB_OTG_IsHostMode(&USB_OTG_dev)) /* ensure that we are in device mode */
+	{
+		USBH_OTG_ISR_Handler(&USB_OTG_dev);
+	}
+	else
+	{
+		USBD_OTG_ISR_Handler(&USB_OTG_dev);
+	}
 }
 #endif
 
