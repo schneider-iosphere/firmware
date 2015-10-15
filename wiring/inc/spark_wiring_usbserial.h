@@ -44,7 +44,7 @@ public:
 	void end();
 	int peek();
 	
-	void Initialize(USBH_Usr_cb_TypeDef_DTO callbacks);
+	void Initialize();
 	void Process();
 
 	virtual size_t write(uint8_t byte);

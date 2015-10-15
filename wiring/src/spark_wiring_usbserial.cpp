@@ -74,9 +74,9 @@ int USBSerial::peek()
 	return USB_USART_Receive_Data(true);
 }
 
-void USBSerial::Initialize(USBH_Usr_cb_TypeDef_DTO callbacks)
+void USBSerial::Initialize()
 {
-	USB_OTG_Setup(callbacks);
+	USB_OTG_Setup();
 }
 
 void USBSerial::Process()

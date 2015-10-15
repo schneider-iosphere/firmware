@@ -108,7 +108,7 @@ typedef struct _USBH_Class_cb1
   
 } USBH_Class_cb_TypeDef_DTO;*/
 
-void USB_OTG_Setup(USBH_Usr_cb_TypeDef_DTO callbacks);
+void USB_OTG_Setup();
 void USB_OTG_Process();
 /**
  * Initialize or deinitialize USB serial

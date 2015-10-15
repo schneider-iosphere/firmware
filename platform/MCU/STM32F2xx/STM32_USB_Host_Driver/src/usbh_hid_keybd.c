@@ -30,7 +30,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbh_hid_keybd.h"
-
+#include "service_debug.h"
 /** @addtogroup USBH_LIB
 * @{
 */
@@ -237,7 +237,7 @@ static void  KEYBRD_Init (void)
 
 static void KEYBRD_Decode(uint8_t *pbuf)
 {
-	/*
+	
   static  uint8_t   shift;
   static  uint8_t   keys[KBR_MAX_NBR_PRESSED];
   static  uint8_t   keys_new[KBR_MAX_NBR_PRESSED];
@@ -249,13 +249,13 @@ static void KEYBRD_Decode(uint8_t *pbuf)
   uint8_t   ix;
   uint8_t   jx;
   uint8_t   error;
- // uint8_t   output;
+  uint8_t   output;
 
   nbr_keys      = 0;
   nbr_keys_new  = 0;
   nbr_keys_last = 0;
   key_newest    = 0x00;
-
+  output = 0;
 
   
   if ((pbuf[0] == KBD_LEFT_SHIFT) || (pbuf[0] == KBD_RIGHT_SHIFT)) {
@@ -300,13 +300,21 @@ static void KEYBRD_Decode(uint8_t *pbuf)
 
   if (nbr_keys_new == 1) {
     key_newest = keys_new[0];
+	
+		//need to use variable or compiler complains
+	if(output == 0)
+	{
+		output = 1;
+	}
 
     if (shift == TRUE) {
-     // output =  HID_KEYBRD_ShiftKey[HID_KEYBRD_Codes[key_newest]];
+      output =  HID_KEYBRD_ShiftKey[HID_KEYBRD_Codes[key_newest]];
     } else {
-      //output =  HID_KEYBRD_Key[HID_KEYBRD_Codes[key_newest]];
+      output =  HID_KEYBRD_Key[HID_KEYBRD_Codes[key_newest]];
     }
-
+	
+	LOG("%c", output);
+	
     //USR_KEYBRD_ProcessData(output);
   } else {
     key_newest = 0x00;
@@ -316,7 +324,7 @@ static void KEYBRD_Decode(uint8_t *pbuf)
   nbr_keys_last  = nbr_keys;
   for (ix = 0; ix < KBR_MAX_NBR_PRESSED; ix++) {
     keys_last[ix] = keys[ix];
-  }*/
+  }
 }
 
 /**

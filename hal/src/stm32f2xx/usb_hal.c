@@ -33,7 +33,7 @@
 #include "usb_conf.h"
 #include "usbd_desc.h"
 #include "delay_hal.h"
-
+#include "usbh_usr.h"
 #include "usbh_core.h"
 #include "usbh_hid_core.h"
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +45,27 @@
 /* Private variables ---------------------------------------------------------*/
 USB_OTG_CORE_HANDLE USB_OTG_dev;
 USBH_HOST USB_Host;
+USBH_Usr_cb_TypeDef USR_Callbacks =
+{
+  USBH_USR_Init,
+  USBH_USR_DeInit,
+  USBH_USR_DeviceAttached,
+  USBH_USR_ResetDevice,
+  USBH_USR_DeviceDisconnected,
+  USBH_USR_OverCurrentDetected,
+  USBH_USR_DeviceSpeedDetected,
+  USBH_USR_Device_DescAvailable,
+  USBH_USR_DeviceAddressAssigned,
+  USBH_USR_Configuration_DescAvailable,
+  USBH_USR_Manufacturer_String,
+  USBH_USR_Product_String,
+  USBH_USR_SerialNum_String,
+  USBH_USR_EnumerationDone,
+  USBH_USR_UserInput,
+  NULL,
+  USBH_USR_DeviceNotSupported,
+  USBH_USR_UnrecoveredError
+};	
 
 extern uint32_t USBH_OTG_ISR_Handler(USB_OTG_CORE_HANDLE *pdev);
 extern uint32_t USBD_OTG_ISR_Handler(USB_OTG_CORE_HANDLE *pdev);
@@ -98,33 +119,11 @@ void Get_SerialNum(void)
 
 #ifdef USB_CDC_ENABLE
 
-void USB_OTG_Setup(USBH_Usr_cb_TypeDef_DTO callbacks)
+void USB_OTG_Setup()
 {
-	
-	USBH_Usr_cb_TypeDef USR_Callbacks =
-{
-  callbacks.Init,
-  callbacks.DeInit,
-  callbacks.DeviceAttached,
-  callbacks.ResetDevice,
-  callbacks.DeviceDisconnected,
-  callbacks.OverCurrentDetected,
-  callbacks.DeviceSpeedDetected,
-  callbacks.DeviceDescAvailable,
-  callbacks.DeviceAddressAssigned,
-  NULL,
-  callbacks.ManufacturerString,
-  callbacks.ProductString,
-  callbacks.SerialNumString,
-  callbacks.EnumerationDone,
-  NULL,
-  NULL,
-  callbacks.DeviceNotSupported,
-  callbacks.UnrecoveredError
-};
 
     DCD_DevDisconnect (&USB_OTG_dev);
-    USB_OTG_StopDevice(&USB_OTG_dev);   
+    USB_OTG_StopDevice(&USB_OTG_dev); 
 
   USBH_Init(&USB_OTG_dev, 
             USB_OTG_HS_CORE_ID,
@@ -346,3 +345,212 @@ void OTG_HS_EP1_OUT_irq(void)
     USBD_OTG_EP1OUT_ISR_Handler (&USB_OTG_dev);
 }
 #endif
+
+
+/**
+* @brief  USBH_USR_Init 
+*         Displays the message on LCD for host lib initialization
+* @param  None
+* @retval None
+*/
+void USBH_USR_Init(void)
+{
+
+}
+
+/**
+* @brief  USBH_USR_DeviceAttached 
+*         Displays the message on LCD on device attached
+* @param  None
+* @retval None
+*/
+void USBH_USR_DeviceAttached(void)
+{  
+
+}
+
+/**
+* @brief  USBH_USR_UnrecoveredError
+* @param  None
+* @retval None
+*/
+void USBH_USR_UnrecoveredError (void)
+{
+
+}
+
+/**
+* @brief  USBH_DisconnectEvent
+*         Device disconnect event
+* @param  None
+* @retval None
+*/
+void USBH_USR_DeviceDisconnected (void)
+{
+
+}
+
+/**
+* @brief  USBH_USR_ResetUSBDevice 
+*         Reset USB Device
+* @param  None
+* @retval None
+*/
+void USBH_USR_ResetDevice(void)
+{
+
+}
+
+
+/**
+* @brief  USBH_USR_DeviceSpeedDetected 
+*         Displays the message on LCD for device speed
+* @param  Devicespeed : Device Speed
+* @retval None
+*/
+void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
+{
+
+}
+
+/**
+* @brief  USBH_USR_Device_DescAvailable 
+*         Displays the message on LCD for device descriptor
+* @param  DeviceDesc : device descriptor
+* @retval None
+*/
+void USBH_USR_Device_DescAvailable(void *DeviceDesc)
+{
+
+}
+
+/**
+* @brief  USBH_USR_DeviceAddressAssigned 
+*         USB device is successfully assigned the Address 
+* @param  None
+* @retval None
+*/
+void USBH_USR_DeviceAddressAssigned(void)
+{
+
+}
+
+
+/**
+* @brief  USBH_USR_Conf_Desc 
+*         Displays the message on LCD for configuration descriptor
+* @param  ConfDesc : Configuration descriptor
+* @retval None
+*/
+void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
+                                          USBH_InterfaceDesc_TypeDef *itfDesc,
+                                          USBH_EpDesc_TypeDef *epDesc)
+{
+ 
+}
+
+/**
+* @brief  USBH_USR_Manufacturer_String 
+*         Displays the message on LCD for Manufacturer String 
+* @param  ManufacturerString : Manufacturer String of Device
+* @retval None
+*/
+void USBH_USR_Manufacturer_String(void *ManufacturerString)
+{
+
+  
+}
+
+/**
+* @brief  USBH_USR_Product_String 
+*         Displays the message on LCD for Product String
+* @param  ProductString : Product String of Device
+* @retval None
+*/
+void USBH_USR_Product_String(void *ProductString)
+{
+
+}
+
+/**
+* @brief  USBH_USR_SerialNum_String 
+*         Displays the message on LCD for SerialNum_String 
+* @param  SerialNumString : SerialNum_String of device
+* @retval None
+*/
+void USBH_USR_SerialNum_String(void *SerialNumString)
+{
+
+} 
+
+/**
+* @brief  EnumerationDone 
+*         User response request is displayed to ask for
+*         application jump to class
+* @param  None
+* @retval None
+*/
+void USBH_USR_EnumerationDone(void)
+{
+  
+} 
+
+/**
+* @brief  USBH_USR_DeviceNotSupported
+*         Device is not supported
+* @param  None
+* @retval None
+*/
+void USBH_USR_DeviceNotSupported(void)
+{
+  
+}  
+
+
+/**
+* @brief  USBH_USR_UserInput
+*         User Action for application state entry
+* @param  None
+* @retval USBH_USR_Status : User response for key button
+*/
+USBH_USR_Status USBH_USR_UserInput(void)
+{
+  
+  USBH_USR_Status usbh_usr_status;
+  
+  //usbh_usr_status = USBH_USR_NO_RESP;  
+  
+  /*Key B3 is in polling mode to detect user action */
+  //if(STM_EVAL_PBGetState(Button_KEY) == RESET) 
+  //{
+    
+    usbh_usr_status = USBH_USR_RESP_OK;
+    
+  //}
+  
+  
+  return usbh_usr_status;
+  
+} 
+
+/**
+* @brief  USBH_USR_OverCurrentDetected
+*         Device Overcurrent detection event
+* @param  None
+* @retval None
+*/
+void USBH_USR_OverCurrentDetected (void)
+{
+  
+}
+
+
+/**
+* @brief  USBH_USR_DeInit
+*         Deint User state and associated variables
+* @param  None
+* @retval None
+*/
+void USBH_USR_DeInit(void)
+{
+}

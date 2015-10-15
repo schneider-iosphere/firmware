@@ -53,6 +53,39 @@
 /** @defgroup USBH_CORE_Exported_Variables
   * @{
   */ 
+  
+  #define DEMO_LOCK()                       demo.lock = 1;
+#define DEMO_UNLOCK()                     demo.lock = 0;
+#define DEMO_IS_LOCKED()                  (demo.lock == 1)
+
+
+typedef enum {
+  DEMO_IDLE   = 0,
+  DEMO_WAIT,  
+  DEMO_DEVICE,
+  DEMO_HOST,
+}Demo_State;
+
+typedef enum {
+  DEMO_HOST_IDLE   = 0,
+  DEMO_HOST_WAIT,  
+}Demo_HOST_State;
+
+typedef enum {
+  DEMO_DEVICE_IDLE   = 0,
+  DEMO_DEVICE_WAIT,    
+}Demo_DEVICE_State;
+
+typedef struct _DemoStateMachine
+{
+  
+  __IO Demo_State           state;
+  __IO Demo_HOST_State       Host_state;
+  __IO Demo_DEVICE_State     Device_state;
+  __IO uint8_t              select;
+  __IO uint8_t              lock;
+  
+}DEMO_StateMachine;
 
 
 extern  USBH_Usr_cb_TypeDef USR_Callbacks;
@@ -77,14 +110,14 @@ void USBH_USR_OverCurrentDetected (void);
 void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed); 
 void USBH_USR_Device_DescAvailable(void *);
 void USBH_USR_DeviceAddressAssigned(void);
-//void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
-                                         // USBH_InterfaceDesc_TypeDef *itfDesc,
-                                         // USBH_EpDesc_TypeDef *epDesc);
+void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
+                                          USBH_InterfaceDesc_TypeDef *itfDesc,
+                                          USBH_EpDesc_TypeDef *epDesc);
 void USBH_USR_Manufacturer_String(void *);
 void USBH_USR_Product_String(void *);
 void USBH_USR_SerialNum_String(void *);
 void USBH_USR_EnumerationDone(void);
-int USBH_USR_UserInput(void);
+USBH_USR_Status USBH_USR_UserInput(void);
 void USBH_USR_DeInit(void);
 void USBH_USR_DeviceNotSupported(void);
 void USBH_USR_UnrecoveredError(void);
