@@ -25,12 +25,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "application.h"
-#include "modem/mdm_hal.h"
-
-extern MDMElectronSerial electronMDM;
 
 // ALL_LEVEL, TRACE_LEVEL, DEBUG_LEVEL, WARN_LEVEL, ERROR_LEVEL, PANIC_LEVEL, NO_LOG_LEVEL
-SerialDebugOutput debugOutput(115200, ALL_LEVEL);
+SerialDebugOutput debugOutput(9600, ALL_LEVEL);
 
 /* Function prototypes -------------------------------------------------------*/
 int tinkerDigitalRead(String pin);
@@ -43,16 +40,13 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 /* This function is called once at start up ----------------------------------*/
 void setup()
 {
-	electronMDM.setDebug(3); // enable this for debugging issues
-
-	delay(3000);
-    DEBUG_D("\e[0;36mHello from the Electron! Boot time is: %d\r\n",millis());
+	DEBUG_D("Hello from the Electron! Boot time is: %d\r\n ms", millis());
 
 	Particle.connect(); // blocking call to connect
 
 	//Register all the Tinker functions
 	Particle.function("digitalread", tinkerDigitalRead);
-    Particle.function("digitalwrite", tinkerDigitalWrite);
+	Particle.function("digitalwrite", tinkerDigitalWrite);
 
 	Particle.function("analogread", tinkerAnalogRead);
 	Particle.function("analogwrite", tinkerAnalogWrite);

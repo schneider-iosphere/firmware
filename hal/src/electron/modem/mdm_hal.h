@@ -32,6 +32,8 @@
 /* Include for debug capabilty */
 #define MDM_DEBUG
 
+#define USE_USART3_HARDWARE_FLOW_CONTROL_RTS_CTS 1
+
 /** basic modem parser class
 */
 class MDMParser
@@ -102,6 +104,12 @@ public:
 
     typedef enum { AUTH_NONE, AUTH_PAP, AUTH_CHAP, AUTH_DETECT } Auth;
 
+    /* Used to cancel all operations */
+    void cancel(void);
+
+    /* User to resume all operations */
+    void resume(void);
+
     /** Combined Init, checkNetStatus, join suitable for simple applications
         \param simpin a optional pin of the SIM card
         \param apn  the of the network provider e.g. "internet" or "apn.provider.com"
@@ -114,12 +122,18 @@ public:
             const char* apn = "spark.telefonica.com", const char* username = NULL,
             const char* password = NULL, Auth auth = AUTH_DETECT);
 
-    /** register (Attach) the MT to the GPRS service.
-        \param simpin a optional pin of the SIM card
+    /**
+     * powerOn Initialize the modem and SIM card
+     * \param simpin a optional pin of the SIM card
+     * \return true if successful, false otherwise
+     */
+    bool powerOn(const char* simpin = NULL);
+
+    /** init (Attach) the MT to the GPRS service.
         \param status an optional struture to with device information
         \return true if successful, false otherwise
     */
-    bool init(const char* simpin = NULL, DevStatus* status = NULL);
+    bool init(DevStatus* status = NULL);
 
     /** get the current device status
         \param strocture holding the device information.
@@ -388,6 +402,7 @@ public:
         RESP_OK       = -2,
         RESP_ERROR    = -3,
         RESP_PROMPT   = -4,
+        RESP_ABORTED  = -5,
 
         // getLine Responses
         #define LENGTH(x)  (x & 0x00FFFF) //!< extract/mask the length
@@ -405,6 +420,7 @@ public:
         TYPE_PROMPT     = 0x300000,
         TYPE_PLUS       = 0x400000,
         TYPE_TEXT       = 0x500000,
+        TYPE_ABORTED    = 0x600000,
 
         // special timout constant
         TIMEOUT_BLOCKING = 0xffffffff
@@ -536,6 +552,7 @@ protected:
     static int _cbUPSND(int type, const char* buf, int len, IP* ip);
     static int _cbUDNSRN(int type, const char* buf, int len, IP* ip);
     static int _cbUSOCR(int type, const char* buf, int len, int* handle);
+    static int _cbUSOCTL(int type, const char* buf, int len, int* handle);
     static int _cbUSORD(int type, const char* buf, int len, char* out);
     typedef struct { char* buf; IP ip; int port; } USORFparam;
     static int _cbUSORF(int type, const char* buf, int len, USORFparam* param);
@@ -564,6 +581,7 @@ protected:
     bool _pwr;
     bool _activated;
     bool _attached;
+    volatile bool _cancel_all_operations;
 #ifdef MDM_DEBUG
     int _debugLevel;
     system_tick_t _debugTime;

@@ -27,13 +27,13 @@
 #include "delay_hal.h"
 #include "wlan_hal.h"
 #include "cellular_hal.h"
-#include "system_cloud.h"
+#include "system_cloud_internal.h"
 #include "system_update.h"
 #include "spark_wiring.h"   // for serialReadLine
 #include "system_network_internal.h"
 #include "system_network.h"
 
-#if Wiring_WiFi && PLATFORM_ID > 2 && PLATFORM_ID != 10 && !defined(SYSTEM_MINIMAL)
+#if SETUP_OVER_SERIAL1
 #define SETUP_LISTEN_MAGIC 1
 void loop_wifitester(int c);
 #include "spark_wiring_usartserial.h"
@@ -92,7 +92,7 @@ template<typename Config> void SystemSetupConsole<Config>::handle(char c)
         print("Your device MAC address is\r\n");
         WLanConfig ip_config;
         ip_config.size = sizeof(ip_config);
-        wlan_fetch_ipconfig(&ip_config);
+        network.fetch_ipconfig(&ip_config);
         uint8_t* addr = ip_config.nw.uaMacAddr;
         print(bytes2hex(addr++, 1).c_str());
         for (int i = 1; i < 6; i++)
@@ -121,7 +121,7 @@ template<typename Config> void SystemSetupConsole<Config>::handle(char c)
     else if ('v' == c)
     {
         StreamAppender appender(serial);
-        system_version_info(&appender);
+        append_system_version_info(&appender);
         print("\r\n");
     }
 }

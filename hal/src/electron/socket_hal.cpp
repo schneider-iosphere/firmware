@@ -19,6 +19,7 @@ int32_t socket_connect(sock_handle_t sd, const sockaddr_t *addr, long addrlen)
     ElectronMDM::IP ip = IPADR(addr_data[2], addr_data[3], addr_data[4], addr_data[5]);
     electronMDM.socketSetBlocking(sd, 5000);
     bool result = electronMDM.socketConnect(sd, ip, port);
+    electronMDM.socketSetBlocking(sd, 0);
     return (result ? 0 : 1);
 }
 
@@ -29,8 +30,7 @@ sock_result_t socket_reset_blocking_call()
 
 sock_result_t socket_receive(sock_handle_t sd, void* buffer, socklen_t len, system_tick_t _timeout)
 {
-    //electronMDM.socketSetBlocking(sd, _timeout);
-    electronMDM.socketSetBlocking(sd, 5000); // force a minimum 5 second timeout
+    electronMDM.socketSetBlocking(sd, _timeout);
     return electronMDM.socketRecv(sd, (char*)buffer, len);
 }
 
@@ -102,3 +102,7 @@ sock_result_t socket_peer(sock_handle_t sd, sock_peer_t* peer, void* reserved)
     return -1;
 }
 
+sock_result_t socket_create_tcp_server(uint16_t port, network_interface_t nif)
+{
+    return -1;
+}

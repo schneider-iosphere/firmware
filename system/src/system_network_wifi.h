@@ -64,8 +64,18 @@ class WiFiNetworkInterface : public ManagedNetworkInterface
 
 protected:
 
+    virtual void on_finalize_listening(bool complete) override
+    {
+        if (complete)
+            SPARK_WLAN_SmartConfigProcess();
+#if PLATFORM_ID<3 // this is needed to get the CC3000 to retry the wifi connection.
+        off();
+#endif
+    }
+
     virtual void on_start_listening() override
     {
+        notify_cannot_shutdown();
         /* If WiFi module is connected, disconnect it */
         network_disconnect(0, 0, NULL);
 
@@ -88,6 +98,8 @@ protected:
         {
             wlan_reset_credentials_store();
         }
+
+        Set_NetApp_Timeout();
     }
 
     void connect_finalize() override
@@ -121,9 +133,10 @@ public:
     }
 
 
-    void connect_cancel() override
+    void connect_cancel(bool cancel, bool calledFromISR) override
     {
-        wlan_connect_cancel(true);
+        if (cancel)
+            wlan_connect_cancel(calledFromISR);
     }
 
     bool has_credentials() override
@@ -168,6 +181,10 @@ public:
         wlan_fetch_ipconfig(target);
     }
 
+    void set_error_count(unsigned count) override
+    {
+        wlan_set_error_count(count);
+    }
 
 };
 

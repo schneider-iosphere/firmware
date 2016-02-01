@@ -81,7 +81,7 @@ struct NetworkInterface
     virtual void connect(bool listen_enabled=true)=0;
     virtual bool connecting()=0;
     virtual bool connected()=0;
-    virtual void connect_cancel()=0;
+    virtual void connect_cancel(bool cancel, bool calledFromISR)=0;
     /**
      * Force a manual disconnct.
      */
@@ -107,6 +107,7 @@ struct NetworkInterface
     virtual void config_clear()=0;
     virtual void update_config()=0;
     virtual void* config()=0;       // not really happy about lack of type
+
 };
 
 
@@ -139,10 +140,6 @@ protected:
         WLAN_SMART_CONFIG_FINISHED = 0;
         WLAN_SMART_CONFIG_STOP = 0;
         WLAN_SERIAL_CONFIG_DONE = 0;
-        WLAN_CONNECTED = 0;
-        WLAN_CONNECTING = 0;
-        WLAN_DHCP = 0;
-        WLAN_CAN_SHUTDOWN = 0;
 
         cloud_disconnect();
         SPARK_LED_FADE = 0;
@@ -202,18 +199,14 @@ protected:
 
         WLAN_LISTEN_ON_FAILED_CONNECT = started && on_stop_listening();
 
-        if (WLAN_SMART_CONFIG_FINISHED)
-        {
-            /* Decrypt configuration information and add profile */
-            SPARK_WLAN_SmartConfigProcess();
-        }
+        on_finalize_listening(WLAN_SMART_CONFIG_FINISHED);
 
         system_notify_event(wifi_listen_end, millis()-start);
 
         WLAN_SMART_CONFIG_START = 0;
-        if (started)
+        if (has_credentials())
             connect();
-        else
+        else if (!started)
             off();
     }
 
@@ -234,12 +227,19 @@ protected:
     virtual void on_now()=0;
     virtual void off_now()=0;
 
-    virtual void fetch_ipconfig(WLanConfig* target)=0;
+    /**
+     *
+     * @param external_process_complete If some external process triggered exit of listen mode.
+     */
+    virtual void on_finalize_listening(bool external_process_complete)=0;
 
 public:
 
+    virtual void fetch_ipconfig(WLanConfig* target)=0;
 
-    bool manual_disconnect()
+    virtual void set_error_count(unsigned count)=0;
+
+    bool manual_disconnect() override
     {
         return WLAN_DISCONNECT;
     }
@@ -272,8 +272,10 @@ public:
         return (WLAN_SMART_CONFIG_START && !(WLAN_SMART_CONFIG_FINISHED || WLAN_SERIAL_CONFIG_DONE));
     }
 
+
     void connect(bool listen_enabled=true) override
     {
+        INFO("ready():%s,connecting():%s,listening():%s",(ready())?"true":"false",(connecting())?"true":"false",(listening())?"true":"false");
         if (!ready() && !connecting() && !listening())
         {
             bool was_sleeping = SPARK_WLAN_SLEEP;
@@ -305,8 +307,6 @@ public:
                 ARM_WLAN_WD(CONNECT_TO_ADDRESS_MAX);    // reset the network if it doesn't connect within the timeout
                 connect_finalize();
             }
-
-            Set_NetApp_Timeout();
         }
     }
 
@@ -316,6 +316,9 @@ public:
         {
             WLAN_DISCONNECT = 1; //Do not ARM_WLAN_WD() in WLAN_Async_Callback()
             WLAN_CONNECTING = 0;
+            WLAN_CONNECTED = 0;
+            WLAN_DHCP = 0;
+
             cloud_disconnect();
             disconnect_now();
             config_clear();
@@ -451,8 +454,13 @@ public:
         WLAN_CAN_SHUTDOWN = 1;
     }
 
+    void notify_cannot_shutdown()
+    {
+        WLAN_CAN_SHUTDOWN = 0;
+    }
 
-    void listen_loop()
+
+    void listen_loop() override
     {
         if (WLAN_SMART_CONFIG_START)
         {
