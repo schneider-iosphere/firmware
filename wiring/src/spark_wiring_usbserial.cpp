@@ -86,5 +86,11 @@ void USBSerial::Process()
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 #ifdef SPARK_USB_SERIAL
-USBSerial Serial;
+USBSerial& _fetch_global_serial()
+{
+	static USBSerial _globalSerial;
+	return _globalSerial;
+}
+
+
 #endif

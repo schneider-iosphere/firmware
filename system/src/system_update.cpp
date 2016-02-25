@@ -156,6 +156,7 @@ void system_lineCodingBitRateHandler(uint32_t bitrate)
 #ifdef START_DFU_FLASHER_SERIAL_SPEED
     if (bitrate == start_dfu_flasher_serial_speed)
     {
+        network.connect_cancel(true, true);
         //Reset device and briefly enter DFU bootloader mode
         System.dfu(false);
     }
@@ -216,9 +217,6 @@ int Spark_Prepare_For_Firmware_Update(FileTransfer::Descriptor& file, uint32_t f
     return result;
 }
 
-void serial_dump(const char* msg, ...);
-
-
 void system_pending_shutdown()
 {
     uint8_t was_set = false;
@@ -229,10 +227,15 @@ void system_pending_shutdown()
     }
 }
 
+inline bool canShutdown()
+{
+	return (System.resetPending() && System.resetEnabled());
+}
+
 void system_shutdown_if_enabled()
 {
     // shutdown if user initiated poweroff or system reset is allowed
-    if (System.resetPending() && System.resetEnabled())
+    if (canShutdown())
     {
         if (SYSTEM_POWEROFF) {              // shutdown network module too.
             system_sleep(SLEEP_MODE_SOFTPOWEROFF, 0, 0, NULL);
@@ -245,9 +248,24 @@ void system_shutdown_if_enabled()
 
 void system_shutdown_if_needed()
 {
-    if (System.resetPending() && System.resetEnabled())
+	static bool in_shutdown = false;
+    if (canShutdown() && !in_shutdown)
     {
+    		in_shutdown = true;
         system_notify_event(reset, 0, nullptr, system_shutdown_if_enabled);
+
+#if PLATFORM_THREADING
+        // timeout for 30 seconds. Keep the system thread pumping queue messages and the background task running
+        system_tick_t start = millis();
+        while (canShutdown() && (millis()-start)<30000)
+        {
+        		// todo - find a more enapsulated way for the SystemThread to take care of re-entranly doing work.
+        		spark_process();
+        		SystemThread.process();
+        }
+        in_shutdown = false;
+        system_shutdown_if_enabled();
+#endif
     }
 }
 
@@ -255,8 +273,7 @@ int Spark_Finish_Firmware_Update(FileTransfer::Descriptor& file, uint32_t flags,
 {
     SPARK_FLASH_UPDATE = 0;
     TimingFlashUpdateTimeout = 0;
-    //serial_dump("update finished flags=%d store=%d", flags, file.store);
-
+    //DEBUG("update finished flags=%d store=%d", flags, file.store);
 
     if (flags & 1) {    // update successful
         if (file.store==FileTransfer::Store::FIRMWARE)
@@ -264,8 +281,8 @@ int Spark_Finish_Firmware_Update(FileTransfer::Descriptor& file, uint32_t flags,
             hal_update_complete_t result = HAL_FLASH_End(NULL);
             system_notify_event(firmware_update, result!=HAL_UPDATE_ERROR ? firmware_update_complete : firmware_update_failed, &file);
 
-
-            if (result==HAL_UPDATE_APPLIED_PENDING_RESTART)
+            // always restart for now
+            if (true || result==HAL_UPDATE_APPLIED_PENDING_RESTART)
             {
                 system_pending_shutdown();
             }

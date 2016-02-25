@@ -26,6 +26,8 @@
 #include "system_event.h"
 #include "system_cloud_internal.h"
 #include "system_network.h"
+#include "system_threading.h"
+#include "system_rgbled.h"
 
 
 enum eWanTimings
@@ -142,8 +144,9 @@ protected:
         WLAN_SERIAL_CONFIG_DONE = 0;
 
         cloud_disconnect();
+        RGBLEDState led_state;
+        led_state.save();
         SPARK_LED_FADE = 0;
-        bool signaling = LED_RGB_IsOverRidden();
         LED_SetRGBColor(RGB_COLOR_BLUE);
         LED_Signaling_Stop();
         LED_On(LED_RGB);
@@ -152,7 +155,7 @@ protected:
 
         const uint32_t start = millis();
         uint32_t loop = start;
-        system_notify_event(wifi_listen_begin, start);
+        system_notify_event(wifi_listen_begin, 0);
 
         /* Wait for SmartConfig/SerialConfig to finish */
         while (network_listening(0, 0, NULL))
@@ -191,11 +194,15 @@ protected:
                 }
                 console.loop();
             }
+#if PLATFORM_THREADING
+            if (!APPLICATION_THREAD_CURRENT()) {
+                SystemThread.process();
+            }
+#endif
         }
 
         LED_On(LED_RGB);
-        if (signaling)
-            LED_Signaling_Start();
+        led_state.restore();
 
         WLAN_LISTEN_ON_FAILED_CONNECT = started && on_stop_listening();
 
@@ -355,8 +362,6 @@ public:
     {
         if (SPARK_WLAN_STARTED)
         {
-            config_clear();
-            cloud_disconnect();
             disconnect();
             off_now();
 
@@ -370,6 +375,7 @@ public:
             WLAN_DHCP = 0;
             WLAN_CONNECTED = 0;
             WLAN_CONNECTING = 0;
+            WLAN_SERIAL_CONFIG_DONE = 1;
             SPARK_LED_FADE = 1;
             LED_SetRGBColor(RGB_COLOR_WHITE);
             LED_On(LED_RGB);
@@ -440,6 +446,7 @@ public:
         }
         else
         {
+            config_clear();
             WLAN_DHCP = 0;
             SPARK_LED_FADE = 0;
             if (WLAN_LISTEN_ON_FAILED_CONNECT)
@@ -481,11 +488,14 @@ public:
 
     void update_config() override
     {
+    		// todo - IPv6 may not set this field.
         bool fetched_config = ip_config.nw.aucIP.ipv4!=0;
         if (WLAN_DHCP && !SPARK_WLAN_SLEEP)
         {
             if (!fetched_config)
             {
+            		memset(&ip_config, 0, sizeof(ip_config));
+            		ip_config.size = sizeof(ip_config);
                 fetch_ipconfig(&ip_config);
             }
         }
